@@ -1,0 +1,1 @@
+pyuic6 -o MainForm.py -x form.ui
