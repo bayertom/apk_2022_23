@@ -8,6 +8,7 @@ class Algorithms:
         pass
 
     def getPointPolygonPositionR(self, q, pol):
+        #Point and polygon position, ray crossing algorithm
         k = 0
         n = len(pol)
 
