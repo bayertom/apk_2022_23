@@ -7,7 +7,8 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-
+from draw import Draw
+from algorithms import *
 
 class Ui_MainForm(object):
     def setupUi(self, MainForm):
@@ -83,6 +84,10 @@ class Ui_MainForm(object):
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionExit)
 
+        # Connect menu item and function
+        self.actionPoint_Polygon.triggered.connect(self.switchSourceClick)
+        self.actionPoint_and_polygon_position.triggered.connect(self.analyzeClick)
+
         self.retranslateUi(MainForm)
         QtCore.QMetaObject.connectSlotsByName(MainForm)
 
@@ -99,7 +104,33 @@ class Ui_MainForm(object):
         self.actionClear.setText(_translate("MainForm", "Clear"))
         self.actionPoint_and_polygon_position.setText(_translate("MainForm", "Point and polygon position"))
         self.actionPoint_and_polygon_position.setShortcut(_translate("MainForm", "Ctrl+A"))
-from draw import Draw
+
+    def switchSourceClick(self):
+        # Change source
+        self.Canvas.switchSource()
+
+    def analyzeClick(self):
+        # Analyze point and polygon position
+
+        #Get point and polygon
+        q = self.Canvas.getPoint()
+        pol = self.Canvas.getPolygon()
+
+        #Analyze position
+        a = Algorithms()
+        res = a.getPointPolygonPositionR(q, pol)
+
+        #Print results
+        dialog = QtWidgets.QMessageBox()
+        dialog.setWindowTitle("Result of analysis")
+
+        if res == 1:
+            dialog.setText("Inside")
+        else:
+            dialog.setText("Outside")
+
+        #Show dialog
+        dialog.exec()
 
 
 if __name__ == "__main__":
