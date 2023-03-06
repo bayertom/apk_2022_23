@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Building simplify</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="Draw" name="Canvas" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menuSimplify">
+    <property name="title">
+     <string>Simplify</string>
+    </property>
+    <addaction name="actionMinimum_Area_Enclosing_Rectangle"/>
+    <addaction name="actionWall_Average"/>
+    <addaction name="separator"/>
+    <addaction name="actionClear"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuSimplify"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen"/>
+   <addaction name="separator"/>
+   <addaction name="actionMinimum_Area_Enclosing_Rectangle"/>
+   <addaction name="actionWall_Average"/>
+   <addaction name="separator"/>
+   <addaction name="actionClear"/>
+  </widget>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/icons/open_file.png</normaloff>:/images/icons/open_file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Open file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/icons/exit.png</normaloff>:/images/icons/exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Close application</string>
+   </property>
+  </action>
+  <action name="actionMinimum_Area_Enclosing_Rectangle">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/icons/maer.png</normaloff>:/images/icons/maer.png</iconset>
+   </property>
+   <property name="text">
+    <string>Minimum Area Enclosing Rectangle</string>
+   </property>
+   <property name="toolTip">
+    <string>Simplify building using Minimum Area Enclosing Rectangle</string>
+   </property>
+  </action>
+  <action name="actionWall_Average">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/icons/wa.png</normaloff>:/images/icons/wa.png</iconset>
+   </property>
+   <property name="text">
+    <string>Wall Average</string>
+   </property>
+   <property name="toolTip">
+    <string>Simplify building using Wall Average</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/icons/clear.png</normaloff>:/images/icons/clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>Clear</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear results</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Draw</class>
+   <extends>QWidget</extends>
+   <header>draw.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>
