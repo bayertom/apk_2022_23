@@ -58,15 +58,15 @@ class Algorithms:
         #Find pivot
         q = min(pol, key = lambda k : k.y())
 
-        #Initialize pj, pj+1
-        pj = QPointF(q.x() - 1, q.y())
-        pj1 = q
+        #Initialize pj-1, pj
+        pj1 = QPointF(q.x() - 1, q.y())
+        pj = q
 
         #Add q to convex hull
         ch.append(q)
 
         # Jarvis scan
-        while pj != q:
+        while pj1 != q:
             #Initialize maximum
             phi_max = 0
             i_max = -1
@@ -75,7 +75,7 @@ class Algorithms:
             for i in range(len(pol)):
 
                 #Measure angle
-                phi = self.get2LinesAngle(pj1, pj, pj1, pol[i])
+                phi = self.get2LinesAngle(pj, pj1, pj, pol[i])
 
                 #Actualize phi_max
                 if phi > phi_max:
@@ -86,8 +86,8 @@ class Algorithms:
             ch.append(pol[i_max])
 
             #Actualize last two points
-            pj = pj1
-            pj1 = pol[i_max]
+            pj1 = pj
+            pj = pol[i_max]
 
         return ch
 
