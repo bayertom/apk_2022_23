@@ -68,8 +68,8 @@ class Algorithms:
         #Add q to convex hull
         ch.append(q)
 
-        # Jarvis scan
-        while pj1 != q:
+        #Jarvis scan
+        while True:
             #Initialize maximum
             phi_max = 0
             i_max = -1
@@ -92,6 +92,10 @@ class Algorithms:
             #Actualize last two points
             pj1 = pj
             pj = pol[i_max]
+
+            #End condition
+            if pj == q:
+                break
 
         return ch
 
