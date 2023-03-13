@@ -8,6 +8,7 @@ class Algorithms:
     def __init__(self):
         pass
 
+
     def getPointPolygonPositionR(self, q, pol):
         k = 0
         n = len(pol)
@@ -36,6 +37,7 @@ class Algorithms:
 
         return 0
 
+
     def get2LinesAngle(self, p1:QPointF,p2:QPointF,p3:QPointF,p4:QPointF):
         ux = p2.x() - p1.x()
         uy = p2.y() - p1.y()
@@ -50,6 +52,7 @@ class Algorithms:
         nv = (vx**2 + vy**2)**0.5
 
         return acos(dp/(nu*nv))
+
 
     def createCH(self, pol:QPolygonF):
         #Create CH using Jarvis scan
@@ -91,6 +94,7 @@ class Algorithms:
             pj = pol[i_max]
 
         return ch
+
 
     def rotate(self, pol:QPolygonF, sig:float)->QPolygonF:
         #Rotate polygon according to a given angle
@@ -135,6 +139,7 @@ class Algorithms:
 
         return minmax_box, area
 
+
     def minAreaEnclosingRectangle(self, pol: QPolygonF):
         # Create minimum area enclosing rectangle
 
@@ -171,6 +176,7 @@ class Algorithms:
 
         return er
 
+
     def computeArea (self, pol : QPolygonF):
         #Comnpute area
         n = len(pol)
@@ -183,12 +189,14 @@ class Algorithms:
 
         return 0.5*area
 
+
     def resizeRectangle(self, er: QPolygonF, pol:QPolygonF):
         #Building area
         Ab = abs(self.computeArea(pol))
 
         #Enclosing rectangle area
         A = abs(self.computeArea(er))
+
         # Fraction of Ab and A
         k = Ab/A
 
