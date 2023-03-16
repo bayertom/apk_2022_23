@@ -1,257 +1,222 @@
 from PyQt6.QtGui import *
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
-from operator import attrgetter
-from typing import List
 from math import *
 
 class Algorithms:
+
     def __init__(self):
         pass
 
-    def get2LinesAngle(self, p1 : QPoint, p2 : QPoint, p3 : QPoint, p4 : QPoint ):
-        # Compute angle formed by two lines
 
-        # Coordinate differences
+    def getPointPolygonPositionR(self, q, pol):
+        k = 0
+        n = len(pol)
+
+        # proces all vertices
+        for i in range(n):
+            #reduce coordinate
+            xir = pol[i].x() - q.x()
+            yir = pol[i].y() - q.y()
+            xi1r = pol[(i+1)%n].x() - q.x()
+            yi1r = pol[(i+1)%n].y() - q.y()
+
+            #Suitable segment
+            if (yi1r > 0) and (yir <= 0) or (yir >0 ) and (yi1r <=0):
+
+                #compute intersection
+                xm = (xi1r*yir - xir*yi1r)/(yi1r - yir)
+
+                # increment amount of intersections
+                if xm > 0:
+                    k += 1
+
+        # point is inside
+        if k % 2 == 1:
+            return 1
+
+        return 0
+
+
+    def get2LinesAngle(self, p1:QPointF,p2:QPointF,p3:QPointF,p4:QPointF):
         ux = p2.x() - p1.x()
         uy = p2.y() - p1.y()
         vx = p4.x() - p3.x()
         vy = p4.y() - p3.y()
 
-        # Dot product
-        dp = ux * vx + uy * vy
+        #Dot product
+        dp = ux*vx + uy*vy
 
-        # Norms
-        nu = (ux * ux + uy * uy)**0.5
-        nv = (vx * vx + vy * vy)**0.5
+        #Norms
+        nu = (ux**2 + uy**2)**0.5
+        nv = (vx**2 + vy**2)**0.5
 
-        # Angle
-        return abs(acos(dp / (nu * nv)))
+        return acos(dp/(nu*nv))
 
 
-    def chJarvis(self, points : QPolygon)->QPolygon:
-        # Create Convex Hull using Jarvis Scan Algorithm
-        ch = QPolygon()
+    def createCH(self, pol:QPolygonF):
+        #Create CH using Jarvis scan
+        ch = QPolygonF()
 
-        #Find pivot q
-        q = min(points, key=lambda k: k.y())
+        #Find pivot
+        q = min(pol, key = lambda k : k.y())
 
-        # Initialize pj, pjj
-        pj = q;
-        pjj = QPoint(0, q.y());
+        #Initialize pj-1, pj
+        pj1 = QPointF(q.x() - 1, q.y())
+        pj = q
 
-        #Add q into Convex Hull
-        ch.append(q);
+        #Add q to convex hull
+        ch.append(q)
 
-        #Find all points of Convex hull
-        while (True):
+        # Jarvis scan
+        while True:
+            #Initialize maximum
+            phi_max = 0
+            i_max = -1
 
-            # Initialize i_max, om_max
-            i_max : int = -1
-            o_max : float = 0
+            #Find suitable point maximizing angle
+            for i in range(len(pol)):
 
-            # Find suitable point maximizing angle omega
-            for i in range(len(points)):
-                # Compute omega
-                if points[i] != pj:
-                    omega = self.get2LinesAngle(pj, pjj, pj, points[i])
+                if pj != pol[i]:
+                    #Measure angle
+                    phi = self.get2LinesAngle(pj, pj1, pj, pol[i])
 
-                    # Actualize maximum
-                    if omega > o_max:
-                        o_max = omega
+                    #Actualize phi_max
+                    if phi > phi_max:
+                        phi_max = phi
                         i_max = i
 
-            # Add point to convex hull
-            ch.append(points[i_max])
+            # Append point to CH
+            ch.append(pol[i_max])
 
-            # Assign points
-            pjj = pj
-            pj = points[i_max]
+            #Actualize last two points
+            pj1 = pj
+            pj = pol[i_max]
 
-            #Stopping condition
+            #Stop condition
             if pj == q:
-                break
+            	break
 
         return ch
 
 
-    def rotate(self, pol : QPolygon, sigma:float)->QPolygon:
-        #Rotate points by angle
-        polr = QPolygon()
+    def rotate(self, pol:QPolygonF, sig:float)->QPolygonF:
+        #Rotate polygon according to a given angle
+        pol_rot = QPolygonF()
+
+        #Process all polygon vertices
         for i in range(len(pol)):
+
             #Rotate point
-            xr = pol[i].x() * cos(sigma) - pol[i].y() * sin(sigma);
-            yr = pol[i].x() * sin(sigma) + pol[i].y() * cos(sigma);
+            x_rot = pol[i].x() * cos(sig) - pol[i].y() * sin(sig)
+            y_rot = pol[i].x() * sin(sig) + pol[i].y() * cos(sig)
 
-            #Create point
-            pr = QPoint(int(xr), int(yr));
+            #Create QPoint
+            vertex = QPointF(x_rot, y_rot)
 
-            #Add point to the list
-            polr.append(pr);
+            # Add vertex to rotated polygon
+            pol_rot.append(vertex)
 
-        return polr
-
-
-    def minMaxBox(self, pol : QPolygon):
-        # Return vertices of min - max box and its area
-        area = 0;
-
-        #Return vertices with extreme coordinates
-        xmin = min(pol, key=lambda k: k.x()).x()
-        xmax = max(pol, key=lambda k: k.x()).x()
-        ymin = min(pol, key=lambda k: k.y()).y()
-        ymax = max(pol, key=lambda k: k.y()).y()
-
-        #Create min - max box vertices
-        v1 = QPoint(xmin, ymin)
-        v2 = QPoint(xmax, ymin)
-        v3 = QPoint(xmax, ymax)
-        v4 = QPoint(xmin, ymax)
-
-        # Create min - max box
-        mmb = QPolygon([v1, v2, v3, v4])
-
-        #Compute min - max box area
-        area = (xmax - xmin) * (ymax - ymin)
-
-        return mmb, area
+        return pol_rot
 
 
-    def minAreaEnclosingRectangle(self, pol : QPolygon):
-        #Create minimum area enclosing rectangle
-        ch = self.chJarvis(pol);
-        n = len(ch)
+    def minMaxBox (self, pol: QPolygonF):
+        #Create minmax box
 
-        #Initialize area_min
+        # Find extreme coordinates
+        x_min = min(pol, key= lambda k: k.x()).x()
+        x_max = max(pol, key = lambda k: k.x()).x()
+        y_min = min(pol, key=lambda k: k.y()).y()
+        y_max = max(pol, key=lambda k: k.y()).y()
+
+        # Create minmax box vertices
+        v1 = QPointF(x_min, y_min)
+        v2 = QPointF(x_max, y_min)
+        v3 = QPointF(x_max, y_max)
+        v4 = QPointF (x_min, y_max)
+
+        #Create min-max box
+        minmax_box = QPolygonF([v1, v2, v3, v4])
+
+        #Compute minmaxbox area
+        area = (x_max - x_min) * (y_max - y_min)
+
+        return minmax_box, area
+
+
+    def minAreaEnclosingRectangle(self, pol: QPolygonF):
+        # Create minimum area enclosing rectangle
+
+        #Create convex hull
+        ch = self.createCH(pol)
+
+        #Get minmax box, area and sigma
+        mmb_min, area_min = self.minMaxBox(ch)
         sigma_min = 0
-        mmb_min, area_min = self.minMaxBox(ch);
 
-        #Process all convex hull segments
-        for i in range(n-1):
-            #Take a segment
-            dx = ch[(i + 1)].x() - ch[i].x();
-            dy = ch[(i + 1)].y() - ch[i].y();
+        # Process all segments of ch
+        for i in range(len(ch)-1):
+            # Compute sigma
+            dx = ch[i+1].x() - ch[i].x()
+            dy = ch[i+1].y() - ch[i].y()
+            sigma = atan2(dy,dx)
 
-	        #Compute its direction
-            sigma = atan2(dy, dx);
+            #Rotate convex hull by sigma
+            ch_rot = self.rotate(ch, sigma)
 
-            # Rotate by - sigma
-            chr = self.rotate(ch, -sigma);
+            # find minmaxbox over rotated ch
+            mmb, area = self.minMaxBox(ch_rot)
 
-            # Create min - max box
-            mmb, area = self.minMaxBox(chr);
-
-            #Update minimum
+            #actualize minimum area
             if area < area_min:
                 area_min = area
-                sigma_min = sigma
                 mmb_min = mmb
+                sigma_min = sigma
 
-        #Create enclosing rectangle, rotate sigma_min
-        er = self.rotate(mmb_min, sigma_min);
+        #Rotate minmax box
+        er = self.rotate(mmb_min, sigma_min)
 
-        #Resize rectangle, preserve area of the building
-        err = self.resizeRectangle(pol, er);
+        #Resize rectangle
 
-        return err;
+        return er
 
 
-    def wallAverage(self, pol : QPolygon):
-        # Create enclosing rectangle using wall average
-        sigma = 0
-        si_sum = 0
-
-        # Compute initial direction
-        dx = pol[1].x() - pol[0].x();
-        dy = pol[1].y() - pol[0].y();
-        sigma0 = atan2(dy, dx);
-
-        #Compute direction of segments
+    def computeArea (self, pol : QPolygonF):
+        #Comnpute area
         n = len(pol)
-        for i in range(n-1):
-            dxi = pol[(i + 1)].x() - pol[i].x();
-            dyi = pol[(i + 1)].y() - pol[i].y();
-            sigmai = atan2(dyi, dxi);
-            lengthi = (dxi * dxi + dyi * dyi)**0.5;
+        area = 0
 
-            #Compute direction differences
-            dsigmai = sigmai - sigma0;
-            if dsigmai < 0:
-                dsigmai += 2 * pi;
-
-            #Compute fraction
-            ki = round(dsigmai / (pi / 2));
-
-            #Compute reminder
-            ri = dsigmai-ki * (pi / 2);
-
-            #Weighted average sums
-            sigma += ri * lengthi;
-            si_sum += lengthi;
-
-        #Weighted average
-        sigma = sigma0 + sigma / si_sum;
-
-        #Rotate by - sigma
-        polr = self.rotate(pol, -sigma);
-
-        #Create min - max box
-        mmb, area = self.minMaxBox(polr);
-
-        #Create enclosing rectangle
-        er = self.rotate(mmb, sigma);
-
-        #Resize rectangle, preserve area of the building
-        err = self.resizeRectangle(pol, er);
-
-        return err;
-
-
-    def LH(self, points : List[QPoint]):
-        #Get area of building by L-Huillier formula
-        n = len(points)
-        area = 0;
-
-        #Proces all vertices of the building
+        #Process all vertices
         for i in range(n):
-            area += points[i].x() * (points[(i + 1) % n].y() - points[(i - 1 + n) % n].y());
+            #Area increment
+            area += pol[i].x()*(pol[(i+1)%n].y()-pol[(i-1+n)%n].y())
 
-        return 0.5 * abs(area)
+        return 0.5*area
 
 
-    def resizeRectangle(self, points : List [QPoint], er : QPolygon):
-        #Resize rectangle to given area
-
+    def resizeRectangle(self, er: QPolygonF, pol:QPolygonF):
         #Building area
-        AB = self.LH(points);
+        Ab = abs(self.computeArea(pol))
 
-        #Rectangle area
-        AR = self.LH(er);
+        #Enclosing rectangle area
+        A = abs(self.computeArea(er))
 
-        #Fraction of areas
-        k = AB / AR;
+        # Fraction of Ab and A
+        k = Ab/A
 
         #Center of mass
-        xc = (er[0].x() + er[1].x() + er[2].x() + er[3].x()) / 4;
-        yc = (er[0].y() + er[1].y() + er[2].y() + er[3].y()) / 4;
+        x_t = (er[0].x() + er[1].x() + er[2].x() + er[3].x())/4
+        y_t = (er[0].y() + er[1].y() + er[2].y() + er[3].y())/4
 
-        #Compute vector components
-        u1x = er[0].x() - xc;
-        u1y = er[0].y() - yc;
-        u2x = er[1].x() - xc;
-        u2y = er[1].y() - yc;
-        u3x = er[2].x() - xc;
-        u3y = er[2].y() - yc;
-        u4x = er[3].x() - xc;
-        u4y = er[3].y() - yc;
+        #Vectors
+        u1_x = er[0].x() - x_t
+        u2_x = er[1].x() - x_t
+        u3_x = er[2].x() - x_t
+        u4_x = er[3].x() - x_t
+        u1_y = er[0].y() - y_t
+        u2_y = er[1].y() - y_t
+        u3_y = er[2].y() - y_t
+        u4_y = er[3].y() - y_t
 
-        #Create new rectangle vertices
-        v1_ = QPoint(int(xc + sqrt(k) * u1x), int(yc + sqrt(k) * u1y))
-        v2_ = QPoint(int(xc + sqrt(k) * u2x), int(yc + sqrt(k) * u2y))
-        v3_ = QPoint(int(xc + sqrt(k) * u3x), int(yc + sqrt(k) * u3y))
-        v4_ = QPoint(int(xc + sqrt(k) * u4x), int(yc + sqrt(k) * u4y))
 
-        #Add vertices
-        er_res = QPolygon([v1_, v2_, v3_, v4_]);
 
-        return er_res
