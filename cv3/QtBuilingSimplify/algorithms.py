@@ -186,7 +186,7 @@ class Algorithms:
 
 
     def computeArea (self, pol : QPolygonF):
-        #Comnpute area
+        #Compute area
         n = len(pol)
         area = 0
 
@@ -247,6 +247,7 @@ class Algorithms:
         return er_r
 
     def wallAverage(self, pol: QPolygonF):
+        # Create enclosing rectangle using wall average
         r_aver = 0
 
         # Compute sigma
@@ -254,7 +255,7 @@ class Algorithms:
         dy = pol[1].y() - pol[0].y()
         sigma = atan2(dy, dx)
 
-        # process all edges
+        # Process all edges
         n = len(pol)
 
         for i in range(1,n):
@@ -298,4 +299,3 @@ class Algorithms:
         er_r = self.resizeRectangle(er, pol)
 
         return er_r
-
