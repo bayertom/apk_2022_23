@@ -7,7 +7,8 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-
+from draw import Draw
+from algorithms import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -84,6 +85,11 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        #Connect signals and slots
+        self.actionMinimum_Area_Enclosing_Rectangle.triggered.connect(self.simplifyERClick)
+        self.actionWall_Average.triggered.connect(self.simplifyWAClick)
+        self.actionClear.triggered.connect(self.clearClick)
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Building simplify"))
@@ -101,7 +107,35 @@ class Ui_MainWindow(object):
         self.actionWall_Average.setToolTip(_translate("MainWindow", "Simplify building using Wall Average"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
         self.actionClear.setToolTip(_translate("MainWindow", "Clear results"))
-from draw import Draw
+
+    def simplifyERClick (self):
+        #Get polygon
+        pol = ui.Canvas.getPolygon()
+
+        #Create convex hull
+        a = Algorithms()
+        er = a.minAreaEnclosingRectangle(pol)
+
+        #Set results and repaint
+        ui.Canvas.setER(er)
+        ui.Canvas.repaint()
+
+    def simplifyWAClick (self):
+        #Get polygon
+        pol = ui.Canvas.getPolygon()
+
+        #Create convex hull
+        a = Algorithms()
+        er = a.wallAverage(pol)
+
+        #Set results and repaint
+        ui.Canvas.setER(er)
+        ui.Canvas.repaint()
+
+    def clearClick(self):
+        #Clear all
+        ui.Canvas.clearAll()
+        ui.Canvas.repaint()
 
 
 if __name__ == "__main__":

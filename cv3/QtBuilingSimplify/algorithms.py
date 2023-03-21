@@ -51,37 +51,40 @@ class Algorithms:
         nu = (ux**2 + uy**2)**0.5
         nv = (vx**2 + vy**2)**0.5
 
-        return acos(dp/(nu*nv))
+	#Correct argument to the interval [-1,1]
+        arg = dp/(nu*nv)
+        arg = max(min(arg,  1), -1 )
 
+        return acos(arg)
 
-    def createCH(self, pol:QPolygonF):
-        #Create CH using Jarvis scan
+    def createCH(self, pol: QPolygonF):
+        # Create CH using Jarvis scan
         ch = QPolygonF()
 
-        #Find pivot
-        q = min(pol, key = lambda k : k.y())
+        # Find pivot
+        q = min(pol, key=lambda k: k.y())
 
-        #Initialize pj-1, pj
+        # Initialize pj-1, pj
         pj1 = QPointF(q.x() - 1, q.y())
         pj = q
 
-        #Add q to convex hull
+        # Add q to convex hull
         ch.append(q)
 
         # Jarvis scan
         while True:
-            #Initialize maximum
+            # Initialize maximum
             phi_max = 0
             i_max = -1
 
-            #Find suitable point maximizing angle
+            # Find suitable point maximizing angle
             for i in range(len(pol)):
 
                 if pj != pol[i]:
-                    #Measure angle
+                    # Measure angle
                     phi = self.get2LinesAngle(pj, pj1, pj, pol[i])
 
-                    #Actualize phi_max
+                    # Actualize phi_max
                     if phi > phi_max:
                         phi_max = phi
                         i_max = i
@@ -89,13 +92,13 @@ class Algorithms:
             # Append point to CH
             ch.append(pol[i_max])
 
-            #Actualize last two points
+            # Actualize last two points
             pj1 = pj
             pj = pol[i_max]
 
-            #Stop condition
+            # Stop condition
             if pj == q:
-            	break
+                break
 
         return ch
 
@@ -133,7 +136,7 @@ class Algorithms:
         v1 = QPointF(x_min, y_min)
         v2 = QPointF(x_max, y_min)
         v3 = QPointF(x_max, y_max)
-        v4 = QPointF (x_min, y_max)
+        v4 = QPointF(x_min, y_max)
 
         #Create min-max box
         minmax_box = QPolygonF([v1, v2, v3, v4])
@@ -162,9 +165,9 @@ class Algorithms:
             sigma = atan2(dy,dx)
 
             #Rotate convex hull by sigma
-            ch_rot = self.rotate(ch, sigma)
+            ch_rot = self.rotate(ch, -sigma)
 
-            # find minmaxbox over rotated ch
+            #Find minmaxbox over rotated ch
             mmb, area = self.minMaxBox(ch_rot)
 
             #actualize minimum area
@@ -177,8 +180,9 @@ class Algorithms:
         er = self.rotate(mmb_min, sigma_min)
 
         #Resize rectangle
+        er_r = self.resizeRectangle(er, pol)
 
-        return er
+        return er_r
 
 
     def computeArea (self, pol : QPolygonF):
@@ -191,7 +195,7 @@ class Algorithms:
             #Area increment
             area += pol[i].x()*(pol[(i+1)%n].y()-pol[(i-1+n)%n].y())
 
-        return 0.5*area
+        return 0.5 * abs(area)
 
 
     def resizeRectangle(self, er: QPolygonF, pol:QPolygonF):
@@ -218,5 +222,80 @@ class Algorithms:
         u3_y = er[2].y() - y_t
         u4_y = er[3].y() - y_t
 
+        #Coordinates of new vertices
+        v1_x = x_t + sqrt(k) * u1_x
+        v1_y = y_t + sqrt(k) * u1_y
 
+        v2_x = x_t + sqrt(k) * u2_x
+        v2_y = y_t + sqrt(k) * u2_y
+
+        v3_x = x_t + sqrt(k) * u3_x
+        v3_y = y_t + sqrt(k) * u3_y
+
+        v4_x = x_t + sqrt(k) * u4_x
+        v4_y = y_t + sqrt(k) * u4_y
+
+        #Create new vertices
+        v1 = QPointF(v1_x, v1_y)
+        v2 = QPointF(v2_x, v2_y)
+        v3 = QPointF(v3_x, v3_y)
+        v4 = QPointF(v4_x, v4_y)
+
+        #Create rectangle
+        er_r = QPolygonF([v1, v2, v3, v4])
+
+        return er_r
+
+    def wallAverage(self, pol: QPolygonF):
+        r_aver = 0
+
+        # Compute sigma
+        dx = pol[1].x() - pol[0].x()
+        dy = pol[1].y() - pol[0].y()
+        sigma = atan2(dy, dx)
+
+        # process all edges
+        n = len(pol)
+
+        for i in range(1,n):
+            # Compute sigma i
+            dx_i = pol[(i+1)%n].x() - pol[i].x()
+            dy_i = pol[(i+1)%n].y() - pol[i].y()
+            sigma_i = atan2(dy_i, dx_i)
+
+            # Direction diferences
+            delta_sigma_i = sigma_i - sigma
+
+            # Corect delta sigma
+            if delta_sigma_i < 0:
+                delta_sigma_i += 2*pi
+
+            # Fraction by pi/2
+            ki = round(2*delta_sigma_i/pi)
+
+            #Remainder
+            r_i = delta_sigma_i - (ki * pi/2)
+
+            #Average remainder
+            r_aver = r_aver + r_i
+
+        #Average remainder
+        r_aver = r_aver/n
+
+        #Average direction
+        sigma_aver = sigma + r_aver
+
+        # Rotate building by sigma
+        pol_rot = self.rotate(pol, -sigma_aver)
+
+        # Find minmaxbox over rotated building
+        mmb, area = self.minMaxBox(pol_rot)
+
+        #Rotate min-max box
+        er = self.rotate(mmb, sigma_aver)
+
+        #Resize building
+        er_r = self.resizeRectangle(er, pol)
+
+        return er_r
 
