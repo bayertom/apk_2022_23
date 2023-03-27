@@ -1,4 +1,4 @@
-from QPoint3DF import *
+from qpoint3df import *
 
 class Edge:
     def __init__(self, start:QPoint3DF, end:QPoint3DF):

@@ -2,7 +2,7 @@ from PyQt6.QtGui import *
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from math import *
-from QPoint3DF import *
+from qpoint3df import *
 
 class Algorithms:
 
