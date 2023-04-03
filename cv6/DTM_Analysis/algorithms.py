@@ -2,7 +2,8 @@ from PyQt6.QtGui import *
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from math import *
-from qpoint3df import *
+from QPoint3DF import *
+from Edge import *
 
 class Algorithms:
 
@@ -10,13 +11,12 @@ class Algorithms:
         pass
 
     def getPointPolygonPositionR(self, q, pol):
-        #Analyze position of the point and polygon using Ray crossing algorithm
         k = 0
         n = len(pol)
 
-        # Proces all vertices
+        # proces all vertices
         for i in range(n):
-            #Reduce coordinate
+            #reduce coordinate
             xir = pol[i].x() - q.x()
             yir = pol[i].y() - q.y()
             xi1r = pol[(i+1)%n].x() - q.x()
@@ -25,23 +25,21 @@ class Algorithms:
             #Suitable segment
             if (yi1r > 0) and (yir <= 0) or (yir >0 ) and (yi1r <=0):
 
-                #Compute intersection
+                #compute intersection
                 xm = (xi1r*yir - xir*yi1r)/(yi1r - yir)
 
-                #Increment amount of intersections
+                # increment amount of intersections
                 if xm > 0:
                     k += 1
 
-        #Point is inside
+        # point is inside
         if k % 2 == 1:
             return 1
 
-        # Point is outside
         return 0
 
 
     def get2LinesAngle(self, p1:QPointF,p2:QPointF,p3:QPointF,p4:QPointF):
-        #Angle between two lines
         ux = p2.x() - p1.x()
         uy = p2.y() - p1.y()
         vx = p4.x() - p3.x()
@@ -54,7 +52,6 @@ class Algorithms:
         nu = (ux**2 + uy**2)**0.5
         nv = (vx**2 + vy**2)**0.5
 
-        #Correct to interval [-1, 1]
         arg = dp/(nu*nv)
         arg = max(min(arg,  1), -1 )
 
@@ -272,31 +269,30 @@ class Algorithms:
         return er_r
 
     def wallAverage(self, pol: QPolygonF):
-        #Simplify buildings using the Wall average method
         r_aver = 0
 
-        #Compute sigma
+        # Compute sigma
         dx = pol[1].x() - pol[0].x()
         dy = pol[1].y() - pol[0].y()
         sigma = atan2(dy, dx)
 
-        #Process all edges
+        # process all edges
         n = len(pol)
 
         for i in range(1,n):
-            #Compute sigma i
+            # Compute sigma i
             dx_i = pol[(i+1)%n].x() - pol[i].x()
             dy_i = pol[(i+1)%n].y() - pol[i].y()
             sigma_i = atan2(dy_i, dx_i)
 
-            #Direction diferences
+            # Direction diferences
             delta_sigma_i = sigma_i - sigma
 
-            #Corect delta sigma
+            # Corect delta sigma
             if delta_sigma_i < 0:
                 delta_sigma_i += 2*pi
 
-            #Fraction by pi/2
+            # Fraction by pi/2
             ki = round(2*delta_sigma_i/pi)
 
             #Remainder
@@ -311,10 +307,10 @@ class Algorithms:
         #Average direction
         sigma_aver = sigma + r_aver
 
-        #Rotate building by sigma
+        # Rotate building by sigma
         pol_rot = self.rotate(pol, -sigma_aver)
 
-        #Find minmaxbox over rotated building
+        # Find minmaxbox over rotated building
         mmb, area = self.minMaxBox(pol_rot)
 
         #Rotate min-max box
@@ -330,11 +326,11 @@ class Algorithms:
         idx_max = -1
         om_max = 0
 
-        #Process all points
+        # Process all points
         for i in range(len(points)):
-            #Exclude identical points
+            # Exclude identical points
             if (points[i] != p1) and (points[i] != p2):
-                #Point in the left halfplane
+                # Point in the left halfplane
                 if self.getPointAndLinePosition(points[i], p1, p2) == 1:
 
                     #Compute angle
@@ -346,3 +342,96 @@ class Algorithms:
                         idx_max = i
 
         return idx_max
+
+    def getNearestPoint(self, p: QPoint3DF, points: List[QPoint3DF]):
+        # Find nearest point
+        idx_min = -1
+        d_min = inf
+
+        # Browse all points
+        for i in range(len(points)):
+
+            # Point p is different from points[i]
+            if p != points[i]:
+                # Compute distance
+                d_x = points[i].x() - p.x()
+                d_y = points[i].y() - p.y()
+                d = sqrt(d_x**2 + d_y**2)
+
+                # Update minimum
+                if d < d_min:
+                    d_min = d
+                    idx_min = i
+
+        return idx_min
+
+
+    def updateAEL(self, e:Edge, AEL:List[Edge]):
+        # Update of AEL
+
+        #Change orientation
+        eo = e.switchOrientation()
+
+        #Opposite edge in AEL
+        if eo in AEL:
+            AEL.remove(eo)
+
+        #Opposite edge on in AEL
+        else:
+            AEL.append(e)
+
+    def createDT (self, points:List[QPoint3DF]):
+        #Create Delaunay triangulation
+
+        #Supplementary data structures
+        dt:List[Edge] = []
+        ael:List[Edge] = []
+
+        #Find a point with the x coordinate
+        p1 = min(points, key = lambda k:k.x())
+
+        # Find nearest point to p1
+        p2 = self.getNearestPoint(p1, points)
+
+        # Create Edge and opposite edge
+        e = Edge(p1, p2)
+        eo = Edge(p2, p1)
+
+        #Add two edges to AEL
+        ael.append(e)
+        ael.append(eo)
+
+        #Process AEL until ti is mepty
+        while ael:
+            #Take the first edge
+            e1 = ael.pop()
+
+            #Switch orientation of e1
+            e1o = e1.switchOrientation()
+
+            #Get Delaunay point
+            idx = e1.getDelaunayPoint(e1o.getStart(),e1o.getEnd(), points)
+
+            # If suitable point found
+            if idx != -1:
+                # Create remaining edges of the triangle
+                e2 = Edge(e1o.getEnd(),points[idx])
+                e3 = Edge(points[idx], e1o.getStart())
+
+                # add edges to DT
+                dt.append(e1o)
+                dt.append(e2)
+                dt.append(e3)
+
+                # Update AEL
+                self.updateAEL(e2, ael)
+                self.updateAEL(e3, ael)
+
+        return dt
+
+
+
+
+
+
+        return
