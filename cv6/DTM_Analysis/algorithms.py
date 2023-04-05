@@ -16,14 +16,14 @@ class Algorithms:
 
         # proces all vertices
         for i in range(n):
-            #reduce coordinate
+            # reduce coordinate
             xir = pol[i].x() - q.x()
             yir = pol[i].y() - q.y()
-            xi1r = pol[(i+1)%n].x() - q.x()
-            yi1r = pol[(i+1)%n].y() - q.y()
+            xi1r = pol[(i+1) % n].x() - q.x()
+            yi1r = pol[(i+1) % n].y() - q.y()
 
             #Suitable segment
-            if (yi1r > 0) and (yir <= 0) or (yir >0 ) and (yi1r <=0):
+            if (yi1r > 0) and (yir <= 0) or (yir > 0) and (yi1r <=0):
 
                 #compute intersection
                 xm = (xi1r*yir - xir*yi1r)/(yi1r - yir)
@@ -38,8 +38,8 @@ class Algorithms:
 
         return 0
 
-
-    def get2LinesAngle(self, p1:QPointF,p2:QPointF,p3:QPointF,p4:QPointF):
+    def get2LinesAngle(self, p1:QPointF, p2:QPointF, p3:QPointF, p4:QPointF):
+        #Get angle between lines
         ux = p2.x() - p1.x()
         uy = p2.y() - p1.y()
         vx = p4.x() - p3.x()
@@ -53,12 +53,12 @@ class Algorithms:
         nv = (vx**2 + vy**2)**0.5
 
         arg = dp/(nu*nv)
-        arg = max(min(arg,  1), -1 )
+        arg = max(min(arg,  1), -1)
 
         return acos(arg)
 
 
-    def getPointAndLinePosition(self, p:QPoint3DF, p1:QPoint3DF ,p2:QPoint3DF):
+    def getPointAndLinePosition(self, p : QPoint3DF, p1 : QPoint3DF, p2 : QPoint3DF):
         #Point and line position
         ux = p2.x() - p1.x()
         uy = p2.y() - p1.y()
@@ -76,7 +76,7 @@ class Algorithms:
         if t < 0:
             return 0
 
-        # Colinear point
+        # Collinear point
         return -1
 
     def createCH(self, pol: QPolygonF):
@@ -125,7 +125,7 @@ class Algorithms:
         return ch
 
 
-    def rotate(self, pol:QPolygonF, sig:float)->QPolygonF:
+    def rotate(self, pol : QPolygonF, sig : float) -> QPolygonF:
         #Rotate polygon according to a given angle
         pol_rot = QPolygonF()
 
@@ -149,8 +149,8 @@ class Algorithms:
         #Create minmax box
 
         # Find extreme coordinates
-        x_min = min(pol, key= lambda k: k.x()).x()
-        x_max = max(pol, key = lambda k: k.x()).x()
+        x_min = min(pol, key=lambda k: k.x()).x()
+        x_max = max(pol, key=lambda k: k.x()).x()
         y_min = min(pol, key=lambda k: k.y()).y()
         y_max = max(pol, key=lambda k: k.y()).y()
 
@@ -163,7 +163,7 @@ class Algorithms:
         #Create min-max box
         minmax_box = QPolygonF([v1, v2, v3, v4])
 
-        #Compute minmaxbox area
+        #Compute min-max box area
         area = (x_max - x_min) * (y_max - y_min)
 
         return minmax_box, area
@@ -279,16 +279,16 @@ class Algorithms:
         # process all edges
         n = len(pol)
 
-        for i in range(1,n):
+        for i in range(1, n):
             # Compute sigma i
-            dx_i = pol[(i+1)%n].x() - pol[i].x()
-            dy_i = pol[(i+1)%n].y() - pol[i].y()
+            dx_i = pol[(i+1) % n].x() - pol[i].x()
+            dy_i = pol[(i+1) % n].y() - pol[i].y()
             sigma_i = atan2(dy_i, dx_i)
 
             # Direction diferences
             delta_sigma_i = sigma_i - sigma
 
-            # Corect delta sigma
+            # Correct delta sigma
             if delta_sigma_i < 0:
                 delta_sigma_i += 2*pi
 
@@ -366,7 +366,7 @@ class Algorithms:
         return idx_min
 
 
-    def updateAEL(self, e:Edge, AEL:List[Edge]):
+    def updateAEL(self, e : Edge, AEL : List[Edge]):
         # Update of AEL
 
         #Change orientation
@@ -384,11 +384,11 @@ class Algorithms:
         #Create Delaunay triangulation
 
         #Supplementary data structures
-        dt:List[Edge] = []
-        ael:List[Edge] = []
+        dt : List[Edge] = []
+        ael : List[Edge] = []
 
         #Find a point with the x coordinate
-        p1 = min(points, key = lambda k:k.x())
+        p1 = min(points, key=lambda k:k.x())
 
         # Find nearest point to p1
         p2 = self.getNearestPoint(p1, points)
@@ -401,7 +401,7 @@ class Algorithms:
         ael.append(e)
         ael.append(eo)
 
-        #Process AEL until ti is mepty
+        #Process AEL until ti is empty
         while ael:
             #Take the first edge
             e1 = ael.pop()
@@ -410,7 +410,7 @@ class Algorithms:
             e1o = e1.switchOrientation()
 
             #Get Delaunay point
-            idx = e1.getDelaunayPoint(e1o.getStart(),e1o.getEnd(), points)
+            idx = e1.getDelaunayPoint(e1o.getStart(), e1o.getEnd(), points)
 
             # If suitable point found
             if idx != -1:
@@ -428,10 +428,3 @@ class Algorithms:
                 self.updateAEL(e3, ael)
 
         return dt
-
-
-
-
-
-
-        return
