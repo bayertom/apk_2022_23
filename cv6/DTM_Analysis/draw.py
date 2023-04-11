@@ -11,8 +11,9 @@ class Draw(QWidget):
         super().__init__(*args, **kwargs)
 
         #Points, DT, contour lines, trinagles
-        self.__points : List[QPoint3DF] = []
-        self.__dt : List[Edge] = []
+        self.__points : list[QPoint3DF] = []
+        self.__dt : list[Edge] = []
+        self.__contours: list[Edge] = []
 
 
     def mousePressEvent(self, e:QMouseEvent):
@@ -39,7 +40,7 @@ class Draw(QWidget):
         #Start draw
         qp.begin(self)
 
-        #Set attributes, building
+        #Set attributes, edges
         qp.setPen(Qt.GlobalColor.black)
         qp.setBrush(Qt.GlobalColor.white)
 
@@ -48,23 +49,31 @@ class Draw(QWidget):
         for point in self.__points:
             qp.drawEllipse(int(point.x()) - r, int(point.y()) - r, 2*r, 2*r)
 
+        # Set attributes
+        qp.setPen(Qt.GlobalColor.green)
 
-        #Draw building
-        #qp.drawPolygon(self.__pol)
+        #Draw triangles
+        for edge in self.__dt:
+            qp.drawLine(int(edge.getStart().x()), int(edge.getStart().y()), int(edge.getEnd().x()), int(edge.getEnd().y()))
 
-        # Set attributes, convex hull
+        # Set attributes
         #qp.setPen(Qt.GlobalColor.blue)
         #qp.setBrush(Qt.GlobalColor.yellow)
 
-        # Draw convex hull
-        #qp.drawPolygon(self.__ch)
+        # Draw contour lines
 
-        # Set attributes, enclosing rectangle
-        #qp.setPen(Qt.GlobalColor.red)
-        #qp.setBrush(Qt.GlobalColor.yellow)
-
-        # Draw building
-        #qp.drawPolygon(self.__er)
+        # Set attributes
+        # qp.setPen(Qt.GlobalColor.blue)
+        # qp.setBrush(Qt.GlobalColor.yellow)
 
         #End draw
         qp.end()
+
+    def setDT(self, dt : list[Edge]):
+        self.__dt = dt
+
+    def setContours(self, contours : list[Edge]):
+        self.__contours = contours
+
+    def getPoints(self):
+        return self.__points

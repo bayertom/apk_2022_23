@@ -1,5 +1,6 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from draw import Draw
+from algorithms import *
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -103,6 +104,7 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.actionParameters)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionClear_results)
+        self.actionCreate_DT.triggered.connect(self.runDT)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -131,6 +133,18 @@ class Ui_MainWindow(object):
         self.actionParameters.setToolTip(_translate("MainWindow", "Setting parameters"))
         self.actionClear_results.setText(_translate("MainWindow", "Clear results"))
         self.actionClear_all.setText(_translate("MainWindow", "Clear all"))
+
+    def runDT(self):
+        #Get points
+        points = self.Canvas.getPoints()
+
+        #Run triangulation
+        a = Algorithms()
+        dt = a.createDT(points)
+
+        #Set results
+        self.Canvas.setDT(dt)
+        self.Canvas.repaint()
 
 
 

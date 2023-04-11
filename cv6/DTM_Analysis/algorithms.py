@@ -16,14 +16,14 @@ class Algorithms:
 
         # proces all vertices
         for i in range(n):
-            # reduce coordinate
+            #reduce coordinate
             xir = pol[i].x() - q.x()
             yir = pol[i].y() - q.y()
-            xi1r = pol[(i+1) % n].x() - q.x()
-            yi1r = pol[(i+1) % n].y() - q.y()
+            xi1r = pol[(i+1)%n].x() - q.x()
+            yi1r = pol[(i+1)%n].y() - q.y()
 
             #Suitable segment
-            if (yi1r > 0) and (yir <= 0) or (yir > 0) and (yi1r <=0):
+            if (yi1r > 0) and (yir <= 0) or (yir >0 ) and (yi1r <=0):
 
                 #compute intersection
                 xm = (xi1r*yir - xir*yi1r)/(yi1r - yir)
@@ -38,8 +38,8 @@ class Algorithms:
 
         return 0
 
-    def get2LinesAngle(self, p1:QPointF, p2:QPointF, p3:QPointF, p4:QPointF):
-        #Get angle between lines
+
+    def get2LinesAngle(self, p1:QPointF,p2:QPointF,p3:QPointF,p4:QPointF):
         ux = p2.x() - p1.x()
         uy = p2.y() - p1.y()
         vx = p4.x() - p3.x()
@@ -53,12 +53,12 @@ class Algorithms:
         nv = (vx**2 + vy**2)**0.5
 
         arg = dp/(nu*nv)
-        arg = max(min(arg,  1), -1)
+        arg = max(min(arg,  1), -1 )
 
         return acos(arg)
 
 
-    def getPointAndLinePosition(self, p : QPoint3DF, p1 : QPoint3DF, p2 : QPoint3DF):
+    def getPointAndLinePosition(self, p:QPoint3DF, p1:QPoint3DF ,p2:QPoint3DF):
         #Point and line position
         ux = p2.x() - p1.x()
         uy = p2.y() - p1.y()
@@ -76,7 +76,7 @@ class Algorithms:
         if t < 0:
             return 0
 
-        # Collinear point
+        # Colinear point
         return -1
 
     def createCH(self, pol: QPolygonF):
@@ -125,7 +125,7 @@ class Algorithms:
         return ch
 
 
-    def rotate(self, pol : QPolygonF, sig : float) -> QPolygonF:
+    def rotate(self, pol:QPolygonF, sig:float)->QPolygonF:
         #Rotate polygon according to a given angle
         pol_rot = QPolygonF()
 
@@ -149,8 +149,8 @@ class Algorithms:
         #Create minmax box
 
         # Find extreme coordinates
-        x_min = min(pol, key=lambda k: k.x()).x()
-        x_max = max(pol, key=lambda k: k.x()).x()
+        x_min = min(pol, key= lambda k: k.x()).x()
+        x_max = max(pol, key = lambda k: k.x()).x()
         y_min = min(pol, key=lambda k: k.y()).y()
         y_max = max(pol, key=lambda k: k.y()).y()
 
@@ -163,7 +163,7 @@ class Algorithms:
         #Create min-max box
         minmax_box = QPolygonF([v1, v2, v3, v4])
 
-        #Compute min-max box area
+        #Compute minmaxbox area
         area = (x_max - x_min) * (y_max - y_min)
 
         return minmax_box, area
@@ -279,16 +279,16 @@ class Algorithms:
         # process all edges
         n = len(pol)
 
-        for i in range(1, n):
+        for i in range(1,n):
             # Compute sigma i
-            dx_i = pol[(i+1) % n].x() - pol[i].x()
-            dy_i = pol[(i+1) % n].y() - pol[i].y()
+            dx_i = pol[(i+1)%n].x() - pol[i].x()
+            dy_i = pol[(i+1)%n].y() - pol[i].y()
             sigma_i = atan2(dy_i, dx_i)
 
             # Direction diferences
             delta_sigma_i = sigma_i - sigma
 
-            # Correct delta sigma
+            # Corect delta sigma
             if delta_sigma_i < 0:
                 delta_sigma_i += 2*pi
 
@@ -321,7 +321,7 @@ class Algorithms:
 
         return er_r
 
-    def getDelaunayPoint(self, p1: QPoint3DF, p2: QPoint3DF, points:List[QPoint3DF]):
+    def getDelaunayPoint(self, p1: QPoint3DF, p2: QPoint3DF, points:list[QPoint3DF]):
         #Find optimal Delaunay point
         idx_max = -1
         om_max = 0
@@ -343,7 +343,7 @@ class Algorithms:
 
         return idx_max
 
-    def getNearestPoint(self, p: QPoint3DF, points: List[QPoint3DF]):
+    def getNearestPoint(self, p: QPoint3DF, points: list[QPoint3DF]):
         # Find nearest point
         idx_min = -1
         d_min = inf
@@ -366,7 +366,7 @@ class Algorithms:
         return idx_min
 
 
-    def updateAEL(self, e : Edge, AEL : List[Edge]):
+    def updateAEL(self, e:Edge, AEL:list[Edge]):
         # Update of AEL
 
         #Change orientation
@@ -380,18 +380,18 @@ class Algorithms:
         else:
             AEL.append(e)
 
-    def createDT (self, points:List[QPoint3DF]):
+    def createDT (self, points:list[QPoint3DF]):
         #Create Delaunay triangulation
 
         #Supplementary data structures
-        dt : List[Edge] = []
-        ael : List[Edge] = []
+        dt:List[Edge] = []
+        ael:List[Edge] = []
 
         #Find a point with the x coordinate
-        p1 = min(points, key=lambda k:k.x())
+        p1 = min(points, key = lambda k:k.x())
 
         # Find nearest point to p1
-        p2 = self.getNearestPoint(p1, points)
+        p2 = points[self.getNearestPoint(p1, points)]
 
         # Create Edge and opposite edge
         e = Edge(p1, p2)
@@ -401,7 +401,7 @@ class Algorithms:
         ael.append(e)
         ael.append(eo)
 
-        #Process AEL until ti is empty
+        #Process AEL until ti is mepty
         while ael:
             #Take the first edge
             e1 = ael.pop()
@@ -410,7 +410,7 @@ class Algorithms:
             e1o = e1.switchOrientation()
 
             #Get Delaunay point
-            idx = e1.getDelaunayPoint(e1o.getStart(), e1o.getEnd(), points)
+            idx = self.getDelaunayPoint(e1o.getStart(),e1o.getEnd(), points)
 
             # If suitable point found
             if idx != -1:
@@ -428,3 +428,75 @@ class Algorithms:
                 self.updateAEL(e3, ael)
 
         return dt
+
+    def getContourLinePoint(self, p1: QPoint3DF, p2: QPoint3DF, z: float):
+        # Intersection of line and horizontal plane
+        xb = (p2.x() - p1.x())*(z - p1.getZ())/(p2.getZ() - p1.getZ()) + p1.x()
+        yb = (p2.y() - p1.y()) * (z - p1.getZ()) / (p2.getZ() - p1.getZ()) + p1.y()
+
+        return QPoint3DF(xb, yb)
+
+    def createContourLines(self, dt: list[Edge], zmin:float, zmax:float, dz:float ):
+        # Create contour lines inside the given interval and step
+        contours: list[Edge] = []
+
+        #Process all triangles
+        for i in range(0,len(dt),3):
+            #Get triangle vertices
+            p1 = dt[i].getStart()
+            p2 = dt[i].getEnd()
+            p3 = dt[i+1].getEnd()
+
+            # Get elevations of points
+            z1 = p1.getZ()
+            z2 = p2.getZ()
+            z3 = p3.getZ()
+
+            # test intersections of all planes
+            for z in range(zmin, zmax, dz):
+                #Get heigh differencies
+                dz1 = z - z1
+                dz2 = z - z2
+                dz3 = z - z3
+
+                #Triangle is coplanar
+                if dz1 == 0 and dz2 == 0 and dz3 == 0:
+                    continue
+
+                #Edges (p1,p2) and (p2,p3) are intersected by plane
+                if dz1*dz2 <= 0 and dz2*dz3 <= 0:
+                    #Compute intersections
+                    a = self.getContourLinePoint(p1, p2, z)
+                    b = self.getContourLinePoint(p2, p3, z)
+
+                    #Create edge
+                    e = Edge(a, b)
+
+                    #Add contour to list of contours
+                    countours.append(e)
+
+                # Edges (p2,p3) and (p3,p1) are intersected by plane
+                elif dz2 * dz3 <= 0 and dz3 * dz1 <= 0:
+                    # Compute intersections
+                    a = self.getContourLinePoint(p2, p3, z)
+                    b = self.getContourLinePoint(p3, p1, z)
+
+                    # Create edge
+                    e = Edge(a, b)
+
+                    # Add contour to list of contours
+                    countours.append(e)
+
+                # Edges (p3,p1) and (p1,p2) are intersected by plane
+                elif dz3 * dz1 <= 0 and dz1 * dz2 <= 0:
+                    # Compute intersections
+                    a = self.getContourLinePoint(p3, p1, z)
+                    b = self.getContourLinePoint(p1, p2, z)
+
+                    # Create edge
+                    e = Edge(a, b)
+
+                    # Add contour to list of contours
+                    countours.append(e)
+
+        return contours
