@@ -434,7 +434,7 @@ class Algorithms:
         xb = (p2.x() - p1.x())*(z - p1.getZ())/(p2.getZ() - p1.getZ()) + p1.x()
         yb = (p2.y() - p1.y()) * (z - p1.getZ()) / (p2.getZ() - p1.getZ()) + p1.y()
 
-        return QPoint3DF(xb, yb)
+        return QPoint3DF(xb, yb, z)
 
     def createContourLines(self, dt: list[Edge], zmin:float, zmax:float, dz:float ):
         # Create contour lines inside the given interval and step
@@ -473,7 +473,7 @@ class Algorithms:
                     e = Edge(a, b)
 
                     #Add contour to list of contours
-                    countours.append(e)
+                    contours.append(e)
 
                 # Edges (p2,p3) and (p3,p1) are intersected by plane
                 elif dz2 * dz3 <= 0 and dz3 * dz1 <= 0:
@@ -485,9 +485,9 @@ class Algorithms:
                     e = Edge(a, b)
 
                     # Add contour to list of contours
-                    countours.append(e)
+                    contours.append(e)
 
-                # Edges (p3,p1) and (p1,p2) are intersected by plane
+                # Edges (p3,p1) and (p1,p          2) are intersected by plane
                 elif dz3 * dz1 <= 0 and dz1 * dz2 <= 0:
                     # Compute intersections
                     a = self.getContourLinePoint(p3, p1, z)
@@ -497,6 +497,6 @@ class Algorithms:
                     e = Edge(a, b)
 
                     # Add contour to list of contours
-                    countours.append(e)
+                    contours.append(e)
 
         return contours
