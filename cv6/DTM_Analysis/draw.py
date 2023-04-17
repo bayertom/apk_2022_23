@@ -3,7 +3,9 @@ from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
 from QPoint3DF import *
 from Edge import *
+from triangle import *
 from random import *
+from math import *
 
 class Draw(QWidget):
 
@@ -14,6 +16,7 @@ class Draw(QWidget):
         self.__points : list[QPoint3DF] = []
         self.__dt : list[Edge] = []
         self.__contours: list[Edge] = []
+        self.__triangles: list[Triangle] = []
 
 
     def mousePressEvent(self, e:QMouseEvent):
@@ -41,13 +44,34 @@ class Draw(QWidget):
         qp.begin(self)
 
         #Set attributes, edges
-        qp.setPen(Qt.GlobalColor.black)
-        qp.setBrush(Qt.GlobalColor.white)
+        #qp.setPen(Qt.GlobalColor.black)
+        #qp.setBrush(Qt.GlobalColor.white)
 
         # Draw points
         r = 10
         for point in self.__points:
             qp.drawEllipse(int(point.x()) - r, int(point.y()) - r, 2*r, 2*r)
+
+        #Draw aspect
+        k = 510 / pi
+
+        #Process triangles one by one
+        for t in self.__triangles:
+            #Get triangle slope
+            slope = t.getSlope()
+
+            #Convert to color
+            col = 255 - int(slope * k)
+
+            #Create color
+            color = QColor(col, col, col)
+            qp.setBrush(color)
+
+            #Create polygon
+            pol = QPolygonF([t.getP1(), t.getP2(), t.getP3()])
+
+            #Draw polygon
+            qp.drawPolygon(pol)
 
         # Set attributes
         qp.setPen(Qt.GlobalColor.green)
@@ -57,10 +81,13 @@ class Draw(QWidget):
             qp.drawLine(int(edge.getStart().x()), int(edge.getStart().y()), int(edge.getEnd().x()), int(edge.getEnd().y()))
 
         # Set attributes
-        #qp.setPen(Qt.GlobalColor.blue)
-        #qp.setBrush(Qt.GlobalColor.yellow)
+        qp.setPen(Qt.GlobalColor.darkRed)
 
         # Draw contour lines
+        for edge in self.__contours:
+            qp.drawLine(int(edge.getStart().x()), int(edge.getStart().y()), int(edge.getEnd().x()), int(edge.getEnd().y()))
+
+
 
         # Set attributes
         # qp.setPen(Qt.GlobalColor.blue)
@@ -75,5 +102,11 @@ class Draw(QWidget):
     def setContours(self, contours : list[Edge]):
         self.__contours = contours
 
+    def setSlope(self, triangles : list[Triangle]):
+        self.__triangles = triangles
+
     def getPoints(self):
         return self.__points
+
+    def getDT(self):
+        return self.__dt

@@ -104,7 +104,11 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.actionParameters)
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionClear_results)
+
+        #Connect signals and slots
         self.actionCreate_DT.triggered.connect(self.runDT)
+        self.actionCreate_contour_lines.triggered.connect(self.runContourLines)
+        self.actionAnalyze_slope.triggered.connect(self.runSlope)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -142,8 +146,38 @@ class Ui_MainWindow(object):
         a = Algorithms()
         dt = a.createDT(points)
 
-        #Set results
+        #Set results to draw
         self.Canvas.setDT(dt)
+        self.Canvas.repaint()
+
+    def runContourLines(self):
+        # Set parameters of contour lines
+        zmin = 0
+        zmax = 1650
+        dz = 10
+
+        # Get DT
+        dt = self.Canvas.getDT()
+
+        #Create contour lines
+        a = Algorithms()
+        contours = a.createContourLines(dt, zmin, zmax, dz)
+
+        #Set resulzs to draw
+        self.Canvas.setContours(contours)
+        self.Canvas.repaint()
+
+    def runSlope(self):
+        # Set parameters of contour lines
+        # Get DT
+        dt = self.Canvas.getDT()
+
+        #Create contour lines
+        a = Algorithms()
+        dtm = a.analyzeDTMSlope(dt)
+
+        #Set resulzs to draw
+        self.Canvas.setSlope(dtm)
         self.Canvas.repaint()
 
 
