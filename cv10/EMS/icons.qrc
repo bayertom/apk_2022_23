@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>V:/Bayer/APK/cv10/icons/barrier.png</file>
+        <file>V:/Bayer/APK/cv10/icons/clear.png</file>
+        <file>V:/Bayer/APK/cv10/icons/displace.png</file>
+        <file>V:/Bayer/APK/cv10/icons/element.png</file>
+        <file>V:/Bayer/APK/cv10/icons/open_file.png</file>
+        <file>V:/Bayer/APK/cv10/icons/settings.png</file>
+    </qresource>
+</RCC>

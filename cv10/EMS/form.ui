@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="Draw" name="Canvas" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+   </widget>
+   <widget class="QMenu" name="menuElement">
+    <property name="title">
+     <string>Input</string>
+    </property>
+    <addaction name="actionElement"/>
+    <addaction name="actionBarrier"/>
+   </widget>
+   <widget class="QMenu" name="menuSimplify">
+    <property name="title">
+     <string>Simplify</string>
+    </property>
+    <addaction name="actionDisplace_1_element"/>
+    <addaction name="separator"/>
+    <addaction name="actionClear"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionSettings"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuElement"/>
+   <addaction name="menuSimplify"/>
+   <addaction name="menuOptions"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen"/>
+   <addaction name="separator"/>
+   <addaction name="actionElement"/>
+   <addaction name="actionBarrier"/>
+   <addaction name="actionDisplace_1_element"/>
+   <addaction name="separator"/>
+   <addaction name="actionSettings"/>
+   <addaction name="separator"/>
+   <addaction name="actionClear"/>
+  </widget>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/V:/Bayer/APK/cv10/icons/open_file.png</normaloff>:/images/V:/Bayer/APK/cv10/icons/open_file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionElement">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/V:/Bayer/APK/cv10/icons/element.png</normaloff>:/images/V:/Bayer/APK/cv10/icons/element.png</iconset>
+   </property>
+   <property name="text">
+    <string>Element</string>
+   </property>
+  </action>
+  <action name="actionBarrier">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/V:/Bayer/APK/cv10/icons/barrier.png</normaloff>:/images/V:/Bayer/APK/cv10/icons/barrier.png</iconset>
+   </property>
+   <property name="text">
+    <string>Barrier</string>
+   </property>
+  </action>
+  <action name="actionDisplace_1_element">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/V:/Bayer/APK/cv10/icons/displace.png</normaloff>:/images/V:/Bayer/APK/cv10/icons/displace.png</iconset>
+   </property>
+   <property name="text">
+    <string>Displace 1 element</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/V:/Bayer/APK/cv10/icons/clear.png</normaloff>:/images/V:/Bayer/APK/cv10/icons/clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/images/V:/Bayer/APK/cv10/icons/settings.png</normaloff>:/images/V:/Bayer/APK/cv10/icons/settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Draw</class>
+   <extends>QWidget</extends>
+   <header>draw.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>
