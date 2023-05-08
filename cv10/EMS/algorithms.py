@@ -635,7 +635,7 @@ class Algorithms:
 
             #Non-diagonal elements, test
             if i < (m-1):
-                A[i,i+1] = b
+                A[i, i+1] = b
                 A[i + 1, i] = b
 
             # Non-diagonal elements, test
