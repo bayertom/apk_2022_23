@@ -6,6 +6,7 @@ from math import *
 from QPoint3DF import *
 from Edge import *
 from triangle import *
+from numpy import *
 
 class Algorithms:
 
@@ -562,14 +563,14 @@ class Algorithms:
         return d, xq, yq
 
     def getPointLineSegmentDistance(self, xa, ya, x1, y1, x2, y2):
-        # Distance between point A=[xa, y] and line segment (p1, p2)
+        # Distance between point A=[xa, ya] and line segment (p1, p2)
         # direction vector
         ux = x2 - x1
         uy = y2 - y1
 
         # normal vector
-        nx = uy
-        ny = -ux
+        nx = -uy
+        ny = ux
 
         #Point P3
         x3 = x1 + nx
@@ -585,7 +586,6 @@ class Algorithms:
 
         #Testing criterion
         t = d13 * d24
-
         #Point between two normals
         if t < 0:
             d, xq, yq = self.getPointLineDistance(xa, ya, x1, y1, x2, y2)
@@ -593,7 +593,57 @@ class Algorithms:
 
         #Point in the left half plane
         if d13 > 0:
+            return self.getEuclidDistance(xa, ya, x1, y1), x1, y1
+
+        # Point in the right half plane
+        return self.getEuclidDistance(xa, ya, x2, y2), x2, y2
+
           
+    def getNearestLineSegmentPoint(self, a, X:matrix, Y:matrix):
+        #Get point on the barrier nearest to p
+        imin = -1
+        dmin = inf
+
+        #Size of the matrix
+        m, n = X.shape
+
+        #Browse all line segments
+        for i in range(m-1):
+            #Distance between point A=[xa, ya] and line segment (p[i], p[i+1])
+            di, xi, yi = self.getPointLineDistance(a.x(),a.y(),X[i,0], Y[i, 0], X[i + 1,0], Y[i + 1, 0])
+
+            #Update minimum
+            if di < dmin:
+                dmin = di
+                imin = i
+                xmin = xi
+                ymin = yi
+
+        return dmin, imin, xmin, ymin
+
+    def createA(self, alpha, beta, gamma, h, m):
+        #Coefficients a, b, c
+        a = alpha + (2*beta)/h**2 + (6*gamma)/h**4
+        b = -beta/h**2 - (4*gamma)/h**4
+        c = gamma / h**4
+
+        A = zeros((m,m))
+
+        for i in range(m):
+            #Main diagonal element
+            A[i,i] = a
+
+            #Non-diagonal elements, test
+            if i < (m-1):
+                A[i,i+1] = b
+                A[i + 1, i] = b
+
+            # Non-diagonal elements, test
+            if i < (m-2):
+                A[i, i+2] = c
+                A[i+2, i] = c
+
+        return A
 
 
 
