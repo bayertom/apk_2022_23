@@ -7,6 +7,7 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
+from algorithms import *
 
 
 class Ui_MainWindow(object):
@@ -95,8 +96,15 @@ class Ui_MainWindow(object):
         self.toolBar.addSeparator()
         self.toolBar.addAction(self.actionClear)
 
+        #User-defined actions
+        self.actionDisplace_1_element.triggered.connect(self.displaceClick)
+        self.actionElement.triggered.connect(self.drawLineClick)
+        self.actionBarrier.triggered.connect(self.drawBarrierClick)
+        self.actionClear.triggered.connect(self.clearClick)
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -112,6 +120,42 @@ class Ui_MainWindow(object):
         self.actionDisplace_1_element.setText(_translate("MainWindow", "Displace 1 element"))
         self.actionClear.setText(_translate("MainWindow", "Clear"))
         self.actionSettings.setText(_translate("MainWindow", "Settings"))
+
+    def displaceClick(self):
+        #Get polyline and barrier
+        L = self.Canvas.getL()
+        B = self.Canvas.getB()
+
+        # Set parameters
+        dmin = 100
+        alpha = 0.3
+        beta = 1000
+        gamma = 1000
+        lam = 20
+        iters = 500
+
+        #Run displacement
+        a = Algorithms()
+        d, xq, yq = a.getPointLineDistance(100, 100, 0, 100, 100, 90)
+        LD = a.minEnergySpline(L, B, alpha, beta, gamma, lam, dmin, iters)
+
+        #Set results
+        self.Canvas.setLD(LD)
+
+        #Repaint
+        self.Canvas.repaint()
+
+    def drawLineClick(self):
+        self.Canvas.setSource(True)
+
+    def drawBarrierClick(self):
+        self.Canvas.setSource(False)
+
+    def clearClick(self):
+        self.Canvas.clearAll()
+        self.Canvas.repaint()
+
+
 from draw import Draw
 
 

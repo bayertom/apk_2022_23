@@ -599,7 +599,7 @@ class Algorithms:
         return self.getEuclidDistance(xa, ya, x2, y2), x2, y2
 
           
-    def getNearestLineSegmentPoint(self, a, X:matrix, Y:matrix):
+    def getNearestLineSegmentPoint(self, xa : float , ya : float, X : matrix, Y : matrix):
         #Get point on the barrier nearest to p
         imin = -1
         dmin = inf
@@ -610,7 +610,7 @@ class Algorithms:
         #Browse all line segments
         for i in range(m-1):
             #Distance between point A=[xa, ya] and line segment (p[i], p[i+1])
-            di, xi, yi = self.getPointLineDistance(a.x(),a.y(),X[i,0], Y[i, 0], X[i + 1,0], Y[i + 1, 0])
+            di, xi, yi = self.getPointLineSegmentDistance(xa, ya, X[i,0], Y[i, 0], X[i + 1,0], Y[i + 1, 0])
 
             #Update minimum
             if di < dmin:
@@ -635,7 +635,7 @@ class Algorithms:
 
             #Non-diagonal elements, test
             if i < (m-1):
-                A[i, i+1] = b
+                A[i,i+1] = b
                 A[i + 1, i] = b
 
             # Non-diagonal elements, test
@@ -644,6 +644,101 @@ class Algorithms:
                 A[i+2, i] = c
 
         return A
+
+    def getEx(self, xi, yi, xn, yn, d, dmin):
+        #Partial derivative of the outer energy accordind to x
+        c = 20 * dmin
+
+        # Vertex is closer than minimum distance
+        if d < dmin:
+            return -c * (xi - xn) / (dmin *d)
+
+        return 0
+
+    def getEy(self, xi, yi, xn, yn, d, dmin):
+        #Partial derivative of the outer energy accordind to y
+        c = 20 * dmin
+
+        # Vertex is closer than minimum distance
+        if d < dmin:
+            return -c * (yi - yn) / (dmin * d)
+
+        return 0
+
+    def minEnergySpline(self, L : list[QPointF], B: list[QPointF], alpha : list[QPointF], beta : float, gamma : float, lam : float, dmin : float, iters):
+        #Minimum energy spline
+        ml = len(L)
+        mb = len(B)
+
+        #Create empty matrices
+        XL = zeros((ml, 1))
+        YL = zeros((ml, 1))
+        XB = zeros((mb, 1))
+        YB = zeros((mb, 1))
+
+        #Convert polyline to matrix representation
+        for i in range(ml):
+            XL[i,0] = L[i].x()
+            YL[i,0] = L[i].y()
+
+        # Convert barrier to matrix representation
+        for i in range(mb):
+            XB[i,0] = B[i].x()
+            YB[i,0] = B[i].y()
+
+        #Compute step h
+        dx = transpose(diff(transpose(XL)))
+        dy = transpose(diff(transpose(YL)))
+
+        H = sqrt(multiply(dx, dx)+multiply(dy, dy))
+        h = H.mean()
+
+        #Create A
+        A = self.createA(alpha, beta, gamma, h, ml)
+
+        #Compute inverse matrix
+        I = identity(ml)
+        AI = linalg.inv(A + lam * I)
+
+        #Create difference matrices
+        DX = zeros((ml, 1))
+        DY = zeros((ml, 1))
+
+        #Displaced vertices
+        XLi = XL
+        YLi = YL
+
+        #Main iteration process
+        for i in range(iters):
+            # Partial derivatives of potentials according to dx, dy
+            Ex = zeros((ml, 1))
+            Ey = zeros((ml, 1))
+
+            #Compute Ex, Ey
+            for j in range(0, ml):
+                # Find nearest point
+                dn, idxn, xn, yn = self.getNearestLineSegmentPoint(XLi[j,0], YLi[j,0],XB, YB)
+
+                # Compute EX, Ey
+                Ex[j, 0] = self.getEx(XLi[j,0], YLi[j,0], xn, yn, dn, dmin)
+                Ey[j, 0] = self.getEy(XLi[j, 0], YLi[j, 0], xn, yn, dn, dmin)
+
+            #Compute shifts
+            DX = AI@(lam*DX - Ex)
+            DY = AI@(lam*DY - Ey)
+
+            XLi = XL + DX
+            YLi = YL + DY
+
+        # Convert matrix representation to polyline
+        LD = []
+        for j in range(ml):
+           v = QPointF(XLi[j, 0], YLi[j, 0])
+           LD.append(v)
+
+        return LD
+
+
 
 
 
